@@ -1,8 +1,3 @@
-{-
-Nombre: Araceli Soffulto
-Legajo: 167.315-4
--}
-
 module Lib where
 import Text.Show.Functions
 
