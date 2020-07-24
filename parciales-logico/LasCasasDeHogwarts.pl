@@ -2,9 +2,12 @@
 %% Parte 1 - Sombrero Seleccionador  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-mago(harry, mestiza, [coraje, amistad, orgullo, inteligencia], slytherin).
-mago(draco, pura, [inteligencia, orgullo], hufflepuff).
-mago(hermione, impura, [inteligencia, orgullo, responsabilidad], na).
+mago(harry, mestiza, [coraje, amistad, orgullo, inteligencia]).
+mago(draco, pura, [inteligencia, orgullo]).
+mago(hermione, impura, [inteligencia, orgullo, responsabilidad]).
+
+odia(harry, slytherin).
+odia(draco, hufflepuff).
 
 casa(gryffindor, [coraje]).
 casa(slytherin, [inteligencia, orgullo]).
@@ -12,21 +15,22 @@ casa(ravenclaw, [inteligencia, responsabilidad]).
 casa(hufflepuff, [amistad]).
 
 permiteEntrar(Mago, Casa):-
-    mago(Mago, _, _, _),
+    mago(Mago, _, _),
     casa(Casa, _),
     Casa \= slytherin.
 
 permiteEntrar(Mago, slytherin):-
-    mago(Mago, Sangre, _, _),
+    mago(Mago, Sangre, _),
     Sangre \= impura.
 
 cumpleCaracteristicas(Mago, Casa):-
-    mago(Mago, _, Caracteristicas, _),
+    mago(Mago, _, Caracteristicas),
     casa(Casa, Requisitos),
     forall(member(Req, Requisitos), member(Req, Caracteristicas)).
 
 sombreroSeleccionador(Mago, Casa):-
-    mago(Mago, _,_, Odia),
+    mago(Mago, _, _),
+    odia(Mago, Odia),
     permiteEntrar(Mago, Casa),
     cumpleCaracteristicas(Mago, Casa),
     Casa \= Odia.
@@ -34,7 +38,7 @@ sombreroSeleccionador(Mago, Casa):-
 sombreroSeleccionador(hermione, gryffindor).
 
 esAmistoso(Mago):-
-    mago(Mago, _, Caract, _),
+    mago(Mago, _, Caract),
     member(amistad, Caract).
 
 cadenaDeAmistades(ListaMagos):-
