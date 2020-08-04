@@ -8,7 +8,3 @@ Conjunto de predicados definidos a través de cláusulas (hechos y reglas) que d
 **Paradigma de Objetos**  
 Conjunto de objetos que se conocen entre sí a través de referencias y se envían mensajes en un ambiente.
 
-### Este Repo
-Acá voy a ir subiendo los parciales que use de práctica para rendir. 
-No son soluciones oficiales, ni están revisadas por profes de la cátedra. Peeero compilan y cumplen con la consigna. 
-**En programación hay más de una forma de hacer las cosas** asi que si llegaste a otra solución no necesariamente está mal, y definitivamente mi solución no es la única correcta. 
