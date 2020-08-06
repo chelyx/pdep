@@ -1,6 +1,4 @@
-# Paradigmas de Programación
-### Sobre la materia
-A lo largo del año, se ven tres paradigmas distintos cubriendo tanto conceptos propios de cada uno como conceptos transversales y buenas prácticas.  
+# Paradigmas de Programación 
 **Paradigma Funcional**  
 Conjunto de funciones (relaciones que cumplen las propiedades de unicidad y existencia), que pueden ser evaluadas para obtener un resultado.  
 **Paradigma Lógico**  
