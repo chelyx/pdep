@@ -24,3 +24,66 @@ suenio(gabriel, futbolista(arsenal)).
 suenio(juan, cantante(100000)).
 % Macarena no quiere ganar la lotería, sí ser cantante estilo “Eruca Sativa” y vender 10.000 discos
 suenio(macarena, cantante(10000)).
+
+% 2. Queremos saber si una persona es ambiciosa, esto ocurre cuando la suma de dificultades de los sueños es mayor a 20. 
+% La dificultad de cada sueño se calcula como
+% 6 para ser un cantante que vende más de 500.000 ó 4 en caso contrario
+dificultadSuenio(cantante(Discos), 6):-
+    Discos > 500000.
+dificultadSuenio(cantante(Discos), 4):-
+    Discos =< 500000.
+% ganar la lotería implica una dificultad de 10 * la cantidad de los números apostados
+dificultadSuenio(ganarLoteria(SerieNumeros), Dificultad):-
+    length(SerieNumeros, CantidadN),
+    Dificultad is CantidadN * 10.
+% lograr ser un futbolista tiene una dificultad de 3 en equipo chico o 16 en caso contrario. Arsenal y Aldosivi son 
+% equipos chicos
+dificultadSuenio(futbolista(Equipo), 3):-
+    equipoChico(Equipo).
+dificultadSuenio(futbolista(Equipo), 16):-
+    not(equipoChico(Equipo)).
+
+equipoChico(arsenal).
+equipoChico(aldosivi).
+
+esAmbicioso(Personaje):-
+    suenio(Personaje, _),
+    findall(Dif, (suenio(Personaje, Suenio), dificultadSuenio(Suenio, Dif)), Dificultades),
+    sum_list(Dificultades, Total),
+    Total > 20.
+
+% 3. Queremos saber si un personaje tiene química con una persona. Esto se da si la persona cree en el personaje y...
+% para Campanita, la persona debe tener al menos un sueño de dificultad menor a 5.
+% para el resto, todos los sueños deben ser puros (ser futbolista o cantante de menos de 200.000 discos)
+% y la persona no debe ser ambiciosa
+
+tienenQuimica(campanita, Persona):-
+    creeEn(Persona, campanita),
+    suenio(Persona, Suenio),
+    dificultadSuenio(Suenio, Dif),
+    Dif < 5.
+
+tienenQuimica(Personaje, Persona):-
+    creeEn(Persona, Personaje),
+    sueniosPuros(Persona),
+    not(esAmbicioso(Persona)).
+
+sueniosPuros(Persona):-
+    suenio(Persona, futbolista(_)).
+sueniosPuros(Persona):-
+    suenio(Persona, cantante(Discos)),
+    Discos < 200000.
+
+% Sabemos que
+% Campanita es amiga de los Reyes Magos y del Conejo de Pascua
+% el Conejo de Pascua es amigo de Cavenaghi, entre otras amistades
+amigo(campanita, reyesMagos).
+amigo(campanita, conejoDePascua).
+amigo(conejoDePascua, cavenaghi).
+amigo(cavenaghi, magoDeOz).
+% Necesitamos definir si un personaje puede alegrar a una persona, esto ocurre
+% si una persona tiene algún sueño, el personaje tiene química con la persona y...
+%   el personaje no está enfermo
+%   o algún personaje de backup no está enfermo. 
+% Un personaje de backup es un amigo directo o indirecto del personaje principal
+

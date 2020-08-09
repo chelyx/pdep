@@ -78,7 +78,7 @@ esCareta(Festival):-
 
 % que no tenga entradas razonables (ver punto 3).
 esCareta(Festival):-
-    festival(Festival, _, Bandas, _),
+    festival(Festival, _, _, _),
     not(entradaRazonable(Festival, _)).
 
 % 3)entradaRazonable/2. Relaciona un festival con una entrada del mismo si se cumple:  
