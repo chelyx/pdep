@@ -1,3 +1,10 @@
+persona(Persona):-
+    creeEn(Persona, _).
+persona(diego).
+
+personaje(Personaje):-
+    creeEn(_, Personaje).
+
 % Queremos reflejar que 
 % Gabriel cree en Campanita, el Mago de Oz y Cavenaghi
 creeEn(gabriel, campanita).
@@ -74,16 +81,43 @@ sueniosPuros(Persona):-
     suenio(Persona, cantante(Discos)),
     Discos < 200000.
 
-% Sabemos que
+% 4. Sabemos que
 % Campanita es amiga de los Reyes Magos y del Conejo de Pascua
 % el Conejo de Pascua es amigo de Cavenaghi, entre otras amistades
 amigo(campanita, reyesMagos).
 amigo(campanita, conejoDePascua).
 amigo(conejoDePascua, cavenaghi).
-amigo(cavenaghi, magoDeOz).
+sonAmigos(A, B):-
+    amigo(A, B); amigo(B,A).
+% Un personaje de backup es un amigo directo o indirecto del personaje principal
+backup(Principal, Directo):-
+    sonAmigos(Principal, Directo).
+backup(Principal, Indirecto):-
+    sonAmigos(Principal, Directo),
+    sonAmigos(Directo, Indirecto),
+    Principal \= Indirecto.
 % Necesitamos definir si un personaje puede alegrar a una persona, esto ocurre
 % si una persona tiene algún sueño, el personaje tiene química con la persona y...
 %   el personaje no está enfermo
 %   o algún personaje de backup no está enfermo. 
-% Un personaje de backup es un amigo directo o indirecto del personaje principal
+cumpleRequisitos(Personaje, Persona):-
+    suenio(Persona, _),
+    tienenQuimica(Personaje, Persona).
 
+puedeAlegrarla(Personaje, Persona):-
+    cumpleRequisitos(Personaje, Persona),
+    not(estaEnfermo(Personaje)).
+
+puedeAlegrarla(Personaje, Persona):-
+    cumpleRequisitos(Personaje, Persona),
+    estaEnfermo(Personaje),
+    backup(Personaje, PersonajeBackup),
+    not(estaEnfermo(PersonajeBackup)).
+
+% Suponiendo que Campanita, los Reyes Magos y el Conejo de Pascua están enfermos, 
+estaEnfermo(campanita).
+estaEnfermo(reyesMagos).
+estaEnfermo(conejoDePascua).
+% el Mago Capria alegra a Macarena, ya que tiene química con ella y no está enfermo
+% Campanita alegra a Macarena; aunque está enferma es amiga del Conejo de Pascua, 
+% que aunque está enfermo es amigo de Cavenaghi que no está enfermo.
