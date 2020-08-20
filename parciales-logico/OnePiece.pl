@@ -36,3 +36,51 @@ impactoEnRecompensa(bepo,sabaody,500).
 impactoEnRecompensa(arlong, llegadaAEastBlue, 20000000).
 impactoEnRecompensa(hatchan, llegadaAEastBlue, 3000).
 
+% 1. Relacionar a dos tripulaciones y un evento si ambas participaron del mismo, lo cual sucede si dicho evento impactó 
+% en la recompensa de al menos un pirata de cada tripulación.
+estuvoEn(Tripulacion, Evento):-
+    tripulante(Alguien, Tripulacion),
+    impactoEnRecompensa(Alguien, Evento, _).
+
+participaron(Tripulacion, OtraTrip, Evento):-
+    estuvoEn(Tripulacion, Evento),
+    estuvoEn(OtraTrip, Evento),
+    Tripulacion \= OtraTrip.
+
+% 2. Saber quién fue el pirata que más se destacó en un evento, en base al impacto que haya tenido su recompensa.
+seDestacoMas(Pirata, Evento):-
+    impactoEnRecompensa(Pirata, Evento, Recompensa),
+    forall((impactoEnRecompensa(OtroPirata, Evento, Rec),  OtroPirata \= Pirata), (Rec < Recompensa)).
+
+% 3. Saber si un pirata pasó desapercibido en un evento, que se cumple si su recompensa no se vio impactada por dicho 
+% evento a pesar de que su tripulación participó del mismo.
+pasoDesapercibido(Pirata, Evento):-
+    tripulante(Pirata, Tripulacion),
+    estuvoEn(Tripulacion, Evento),
+    not(impactoEnRecompensa(Pirata, Evento, _)).
+
+% 4. Saber cuál es la recompensa total de una tripulación, que es la suma de las recompensas actuales de sus miembros.
+recompensaPirataTotal(Pirata, Recompensa):-
+    tripulante(Pirata, _),
+    findall(Rec, impactoEnRecompensa(Pirata, _, Rec), Lista),
+    sum_list(Lista, Recompensa).
+
+recompensaTripulacionTotal(Tripulacion, RecTotal):-
+    tripulante(_, Tripulacion),
+    findall(Rec, (tripulante(Pirata, Tripulacion), recompensaPirataTotal(Pirata, Rec)), Lista),
+    sum_list(Lista, RecTotal).
+
+% 5. Saber si una tripulación es temible. Lo es si todos sus integrantes son peligrosos o si la recompensa total de la 
+% tripulación supera los $500.000.000. Consideramos peligrosos a piratas cuya recompensa actual supere los $100.000.000.
+
+pirataPeligroso(Pirata):-
+    recompensaPirataTotal(Pirata, Total),
+    Total > 100000000.
+
+tripulacionPeligrosa(Tripulacion):-
+    tripulante(_, Tripulacion),
+    forall(tripulante(Pirata, Tripulacion), pirataPeligroso(Pirata)).
+
+tripulacionPeligrosa(Tripulacion):-
+    recompensaTripulacionTotal(Tripulacion, RecTotal),
+    RecTotal > 500000000.
