@@ -73,10 +73,6 @@ recompensaTripulacionTotal(Tripulacion, RecTotal):-
 % 5. Saber si una tripulación es temible. Lo es si todos sus integrantes son peligrosos o si la recompensa total de la 
 % tripulación supera los $500.000.000. Consideramos peligrosos a piratas cuya recompensa actual supere los $100.000.000.
 
-pirataPeligroso(Pirata):-
-    recompensaPirataTotal(Pirata, Total),
-    Total > 100000000.
-
 tripulacionPeligrosa(Tripulacion):-
     tripulante(_, Tripulacion),
     forall(tripulante(Pirata, Tripulacion), pirataPeligroso(Pirata)).
@@ -84,3 +80,46 @@ tripulacionPeligrosa(Tripulacion):-
 tripulacionPeligrosa(Tripulacion):-
     recompensaTripulacionTotal(Tripulacion, RecTotal),
     RecTotal > 500000000.
+
+%%%%%%%%%%%
+% PARTE 2 %
+%%%%%%%%%%%
+
+especieFeroz(lobo).
+especieFeroz(leopardo).
+especieFeroz(anaconda).
+% paramecia(peligrosa/noPeligrosa).
+% zoan(Animal). 
+% logia(ElementoNatural). %todas peligrosas
+% comioFruta(Quien, TipoFruta).
+
+comioFruta(luffy, paramecia(noPeligrosa)).
+comioFruta(buggy, paramecia(noPeligrosa)).
+comioFruta(law, paramecia(peligrosa)).
+comioFruta(chopper, zoan(humano)).
+comioFruta(lucci, zoan(leopardo)).
+comioFruta(smoker, logia(humo)).
+
+% 6A. Necesitamos modificar la funcionalidad anterior, porque ahora hay otra forma en la cual una persona puede 
+% considerarse peligrosa: alguien que comió una fruta peligrosa se considera peligroso, independientemente de cuál 
+% sea el precio sobre su cabeza.
+frutaPeligrosa(logia(_)).
+frutaPeligrosa(paramecia(peligrosa)).
+frutaPeligrosa(zoan(Especie)):-
+    especieFeroz(Especie).
+
+pirataPeligroso(Pirata):-
+    recompensaPirataTotal(Pirata, Total),
+    Total > 100000000.
+pirataPeligroso(Alguien):-
+    comioFruta(Alguien, Fruta),
+    frutaPeligrosa(Fruta).
+
+% 6B. decidi usar functores para modelar los tipos de fruta y asi poder analizar la peligrosidad de cada una 
+% independientemente de las demas. Para registrar quien comio qué, no guarde los nombres de las frutas sino solo el tipo
+% ya que era info extra.
+
+% 7. Saber si una tripulación es de piratas de asfalto, que se cumple si ninguno de sus miembros puede nadar.
+tripulacionDeAsfalto(Tripulacion):-
+    tripulante(_, Tripulacion),
+    forall(tripulante(Pirata, Tripulacion), comioFruta(Pirata, _)).
