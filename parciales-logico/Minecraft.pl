@@ -80,4 +80,10 @@ nivelPeligrosidad(Lugar, Nivel):-
     CantidadPersonas \= 0,
     Nivel is (CantidadHambrientos * 100) / CantidadPersonas.
 % - Si hay monstruos, es 100.
+nivelPeligrosidad(Lugar, 100):-
+    hayMonstruos(Lugar).
 % - Si el lugar no está poblado, sin importar la presencia de monstruos, es su nivel de oscuridad * 10. 
+nivelPeligrosidad(Lugar, Nivel):-
+    lugar(Lugar, Personas, Oscuridad),
+    length(Personas, 0),
+    Nivel is Oscuridad * 10.
