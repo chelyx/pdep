@@ -8,6 +8,9 @@ herramienta(cata, circulo(100,5)).
 % Las cucharas tienen una longitud en cms.
 % Hay distintos tipos de libro.
 
+jugador(Jugador):-
+    herramienta(Jugador, _).
+
 % 1. Modelar los jugadores y elementos y agregarlos a la base de conocimiento, utilizando los ejemplos provistos.
 % Ana tiene agua, vapor, tierra y hierro. Beto tiene lo mismo que Ana. Cata tiene fuego, tierra, agua y aire, 
 % pero no tiene vapor. 
@@ -39,7 +42,7 @@ construir(silicio, [tierra]).
 tieneIngredientesPara(Jugador, Elemento):-
     % ingredientesBase(Elemento, ListaIng),
     construir(Elemento, ListaIng),
-    tieneElemento(Jugador, _),
+    jugador(Jugador),
     forall(member(Ing, ListaIng), tieneElemento(Jugador, Ing)).
 
 % ingredientesBase(Elemento, Lista):-
@@ -72,16 +75,42 @@ herramientaRequerida(Elemento, libro(inerte)):-
 
 herramientaRequerida(Elemento, cuchara(Longitud)):-
     herramienta(_, cuchara(Longitud)),
-    findall(E, construir(Elemento, E), Lista),
+    construir(Elemento, Lista),
     length(Lista, Int),
     Int < Longitud / 10.
 herramientaRequerida(Elemento, circulo(Diam, Niveles)):-
     herramienta(_, circulo(Diam, Niveles)),
-    findall(E, construir(Elemento, E), Lista),
+    construir(Elemento, Lista),
     length(Lista, Int),
-    Int < Diam * Niveles.
+    Int < (Diam / 100) * Niveles.
 
 puedeConstruir(Jugador, Elemento):-
     tieneIngredientesPara(Jugador, Elemento),
-    forall(herramientaRequerida(Elemento, Herramienta),
-    herramienta(Jugador, Herramienta)).
+    herramientaRequerida(Elemento, Herramienta),
+    herramienta(Jugador, Herramienta).
+
+% 5. Saber si alguien es todopoderoso, que es cuando tiene todos los elementos primitivos (los que no pueden 
+% construirse a partir de nada) y además cuenta con herramientas que sirven para construir cada elemento que no tenga.
+% Por ejemplo, cata es todopoderosa, pero beto no.
+elementoPrimitivo(Elemento):-
+    tieneElemento(_, Elemento),
+    not(construir(Elemento, _)).
+
+esTodopoderoso(Jugador):-
+    jugador(Jugador),
+    forall(elementoPrimitivo(Elemento), tieneElemento(Jugador, Elemento)),
+    forall((not(tieneElemento(Jugador, Elemento)), herramientaRequerida(Elemento, Herramienta)), herramienta(Jugador, Herramienta)).
+
+% 6. Conocer quienGana, que es quien puede construir más cosas.
+% Por ejemplo, cata gana, pero beto no.
+
+puedeConstruirTotal(Jugador, Cantidad):-
+    jugador(Jugador),
+    findall(E, puedeConstruir(Jugador, E), Lista),
+    length(Lista, Cantidad).
+
+quienGana(Jugador):-
+    jugador(Jugador),
+    puedeConstruirTotal(Jugador, Total),
+    forall((jugador(Jugador2), Jugador2\=Jugador, puedeConstruirTotal(Jugador2, Tot2)), Total > Tot2).
+
