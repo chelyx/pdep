@@ -71,5 +71,13 @@ correPeligro(Persona):-
     not(tieneItemComestible(Persona, _)).
 % c. Obtener el nivel de peligrosidad de un lugar, el cual es un número de 0 a 100 y se calcula:
 % - Si no hay monstruos, es el porcentaje de hambrientos sobre su población total.
+nivelPeligrosidad(Lugar, Nivel):-
+    lugar(Lugar, Personas, _),
+    not(hayMonstruos(Lugar)),
+    findall(Hambriento, (member(Hambriento, Personas), hambriento(Hambriento)), ListaHambrientos),
+    length(ListaHambrientos, CantidadHambrientos),
+    length(Personas, CantidadPersonas),
+    CantidadPersonas \= 0,
+    Nivel is (CantidadHambrientos * 100) / CantidadPersonas.
 % - Si hay monstruos, es 100.
-% - Si el lugar no está poblado, sin importar la presencia de monstruos, es su nivel de oscuridad * 10. nivelPeligrosidad/2
+% - Si el lugar no está poblado, sin importar la presencia de monstruos, es su nivel de oscuridad * 10. 
