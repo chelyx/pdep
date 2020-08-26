@@ -34,11 +34,6 @@ sePreocupaPorSuSalud(Persona):-
 existe(Item):-
     tieneItem(_, Item).
 
-cantidadDeItem(Persona, Item, 0):-
-    jugador(Persona, _,_),
-    existe(Item),
-    not(tieneItem(Persona, Item)).
-
 cantidadDeItem(Persona, Item, Cantidad):-
     jugador(Persona, _,_),
     existe(Item),
@@ -47,7 +42,7 @@ cantidadDeItem(Persona, Item, Cantidad):-
 % d. Relacionar un jugador con un ítem, si de entre todos los jugadores, es el que más cantidad tiene de ese ítem. tieneMasDe/2
 tieneMasDe(Persona, Item):-
     cantidadDeItem(Persona, Item, Cantidad),
-    forall((persona(OtraPersona), cantidadDeItem(OtraPersona, Item, Cantidad2), Persona \= OtraPersona), Cantidad > Cantidad2).
+    forall((cantidadDeItem(OtraPersona, Item, Cantidad2), Persona \= OtraPersona), Cantidad > Cantidad2).
 
 % 2) Alejarse de la oscuridad 
 % a. Obtener los lugares en los que hay monstruos. Se sabe que los monstruos aparecen en los lugares cuyo nivel de oscuridad es más de 6. 
@@ -89,7 +84,7 @@ nivelPeligrosidad(Lugar, Nivel):-
     Nivel is Oscuridad * 10.
 
 
-% El aspecto más popular del juego es la construcción. Se pueden construir nuevos ítems a partir de otros, cada uno tiene ciertos requisitos 
+% 3. El aspecto más popular del juego es la construcción. Se pueden construir nuevos ítems a partir de otros, cada uno tiene ciertos requisitos 
 % para poder construirse:
 % - Puede requerir una cierta cantidad de un ítem simple, que es aquel que el jugador tiene o puede recolectar. Por ejemplo, 8 unidades de piedra.
 % - Puede requerir un ítem compuesto, que se debe construir a partir de otros (una única unidad).
@@ -99,7 +94,6 @@ item(horno, [ itemSimple(piedra, 8) ]).
 item(placaDeMadera, [ itemSimple(madera, 1) ]).
 item(palo, [ itemCompuesto(placaDeMadera) ]).
 item(antorcha, [ itemCompuesto(palo), itemSimple(carbon, 1) ]).
-
 
 tieneMaterial(Jugador, itemSimple(Item, Cant)):-
     cantidadDeItem(Jugador, Item, Cantidad),
@@ -112,3 +106,9 @@ puedeConstruir(Jugador, Item):-
     persona(Jugador),
     item(Item, ListaMateriales),
     forall(member(Material, ListaMateriales), tieneMaterial(Jugador, Material)).
+
+% 4) Para pensar sin bloques
+% a. ¿Qué sucede si se consulta el nivel de peligrosidad del desierto? ¿A qué se debe?
+% si se preguntara nivelPeligrosidad(desierto, Nivel). devuelve false porque no tiene ningun registro de un lugar llamado
+% desierto, y todo lo que no esta definido es falso.
+% b. ¿Cuál es la ventaja que nos ofrece el paradigma lógico frente a funcional a la hora de realizar una consulta?
