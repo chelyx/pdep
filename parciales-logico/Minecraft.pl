@@ -87,3 +87,28 @@ nivelPeligrosidad(Lugar, Nivel):-
     lugar(Lugar, Personas, Oscuridad),
     length(Personas, 0),
     Nivel is Oscuridad * 10.
+
+
+% El aspecto más popular del juego es la construcción. Se pueden construir nuevos ítems a partir de otros, cada uno tiene ciertos requisitos 
+% para poder construirse:
+% - Puede requerir una cierta cantidad de un ítem simple, que es aquel que el jugador tiene o puede recolectar. Por ejemplo, 8 unidades de piedra.
+% - Puede requerir un ítem compuesto, que se debe construir a partir de otros (una única unidad).
+% Con la siguiente información, se pide relacionar un jugador con un ítem que puede construir. puedeConstruir/2
+
+item(horno, [ itemSimple(piedra, 8) ]).
+item(placaDeMadera, [ itemSimple(madera, 1) ]).
+item(palo, [ itemCompuesto(placaDeMadera) ]).
+item(antorcha, [ itemCompuesto(palo), itemSimple(carbon, 1) ]).
+
+
+tieneMaterial(Jugador, itemSimple(Item, Cant)):-
+    cantidadDeItem(Jugador, Item, Cantidad),
+    Cantidad >= Cant.
+
+tieneMaterial(Jugador, itemCompuesto(Item)):-
+    puedeConstruir(Jugador, Item).
+
+puedeConstruir(Jugador, Item):-
+    persona(Jugador),
+    item(Item, ListaMateriales),
+    forall(member(Material, ListaMateriales), tieneMaterial(Jugador, Material)).
