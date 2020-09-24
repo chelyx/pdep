@@ -1,0 +1,32 @@
+import model.habitantes.*
+import model.disfraces.*
+import model.casa.*
+
+describe "Cuantos caramelos darían por un disfraz" {
+
+	test "Azucena da 5 caramelos cuando no le gusta el disfraz" {
+		assert.equals(azucena.darCaramelos(ironman), 5)
+	}
+	
+	test "Azucena da tantos caramelos como ternura cuando le gusta el disfraz" {
+		assert.equals(azucena.darCaramelos(harleyQuinn), 9)
+	}
+	
+	test "Sandra da 8 caramelos cuando la casa está en orden" {
+		casa.caos(1)
+		assert.equals(sandra.darCaramelos(ironman), 8)
+	}
+	test "Sandra da 2 caramelos cuando la casa no está en orden" {
+		casa.caos(10)
+		assert.equals(sandra.darCaramelos(ironman), 2)
+	}
+	
+	test "Jorge da 10 caramelos cuando hay muchos en la casa" {
+		casa.caramelos(100)
+		assert.equals(jorge.darCaramelos(ironman), 10)
+	}
+	test "Jorge da 4 caramelos cuando hay menos caramelos en la casa" {
+		casa.caramelos(10)
+		assert.equals(jorge.darCaramelos(ironman), 4)
+	}
+}

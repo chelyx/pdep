@@ -1,0 +1,34 @@
+import model.chicos.*
+import model.disfraces.*
+import model.habitantes.*
+import model.casa.*
+
+describe "Cuantos caramelos puede conseguir un chico en una casa" {
+	test "Rolo consigue un caramelo independientemente de quien abra la puerta" {
+		assert.equals(1, rolo.cuantosCaramelosPuedeConseguir(sandra))
+	}
+	
+	test "Juanita puede conseguir 2 caramelos extra de quien abra la puerta" {
+		const caramelos = sandra.darCaramelos(harleyQuinn)
+		const obtenidos = juanita.cuantosCaramelosPuedeConseguir(sandra)
+		const esDos = obtenidos - caramelos
+		assert.equals(2, esDos)
+	}
+	
+	test "Tito puede conseguir tantos caramelos como Juanita si se disfrazan igual" {
+		juanita.disfraz(superheroe)
+		tito.disfraz(superheroe)
+		const caramJuana = juanita.cuantosCaramelosPuedeConseguir(jorge)
+		const caramTito = tito.cuantosCaramelosPuedeConseguir(jorge)
+		assert.equals(caramTito, caramJuana)
+	}
+	
+	test "Tito puede conseguir lo que da quien abre la puerta si se disfraza distinto de Juanita" {
+		juanita.disfraz(superheroe)
+		tito.disfraz(venom)
+		const caramJuana = juanita.cuantosCaramelosPuedeConseguir(jorge)
+		const caramTito = tito.cuantosCaramelosPuedeConseguir(jorge)
+		assert.notEquals(caramTito, caramJuana)
+		assert.equals(caramTito, jorge.darCaramelos(venom))
+	}
+}
