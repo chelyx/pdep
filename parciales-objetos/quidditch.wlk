@@ -1,110 +1,152 @@
-class Pokemon {
-	var salud
-	var property saludMaxima
-	var property condicion
-	var property movimientos
+// pelotas
+class Quaffle {
+	method laUsan() = 'cazadores'
+	method cantidad() = 1
+	// suma 10 meterla en el aro
+	//El guardián debe proteger los aros y evitar que le metan un gol.
+}
+
+class Bludger {
+	method cantidad() = 2
+	//batear apuntando hacia un jugador del otro equipo y los más grosos hasta pueden evitar goles desviando la quaffle
+}
+
+class Snitch {
+	// buscador es el encargado de buscar la snitch y atraparla
+}
+
+// escobas
+class Nimbus {
+	const anioFabricacion
+	var porcentajeSalud
 	
-	method grositud() {
-		return self.saludMaxima() * self.movimientos().map({m => m.poder()}).sum()
-	}
-	
-	method recibirDanio(danio) {
-		salud -= danio
-		salud = [salud, 0].max()
-	}
-	
-	method recibirCuracion(cant) {
-		salud += cant
-		salud = [salud, saludMaxima].min()
-	}
-	
-	method puedeMoverse(){
-		return salud > 0 && condicion.permiteMoverse(self)
-	}
-	
-	method lucharContra(oponente, mov) {
-		mov.usar(self, oponente)
+	method velocidad() {
+		return (80-anioFabricacion)*porcentajeSalud
 	}
 }
 
-//movimientos
-class Movimiento {
-	var property cantUsos
-	method poder()
-	method usar(realizador, oponente) {
-		const movDisponible = realizador.movimientos().filter({m => m.cantUsos() > 0}).contains(self)
-		if(!realizador.puedeMoverse()) {
-			throw new NoPuedeMoverseError()
-		} 
-		if(!movDisponible) {
-			throw new MovimientoNoDisponibleError()
+class SaetaFuego {
+	method velocidad() = 100
+}
+
+// posiciones
+class Cazador {
+	var property tieneQuaffle = false
+
+	method habilidad(jugador) {
+		return jugador.velocidad() + jugador.skills() + jugador.punteria() * jugador.fuerza()
+	}
+	
+	method jugarTurno(jugador, equipoContrario) {
+		if(tieneQuaffle) {
+			if (equipoContrario.puedeBloquearTiro()) {
+				jugador.perderSkills(2)
+				const jugadorBloqueo = equipoContrario.quienPuedeBloquear()
+				jugadorBloqueo.mejorarSkills(10)
+			}else {
+				jugador.ganarPuntos(10)
+				jugador.mejorarSkills(5)
+			}
+			self.perderQuaffle(equipoContrario)
 		}
-		cantUsos -= 1
+	}
+	
+	method perderQuaffle(equipoContrario){
+		tieneQuaffle = false
+		equipoContrario.cazadorMasRapido().posicion(new Cazador(tieneQuaffle = true))
 	}
 }
 
-class MovimientosCurativos inherits Movimiento {
-	var property salud
-	override method poder() = salud
-	override method usar(r, o) {
-		super(r, o)
-		r.recibirCuracion(salud)
+class Guardian {
+	method habilidad(jugador) {
+		return jugador.velocidad() + jugador.skills() + jugador.reflejos() + jugador.fuerza()
 	}
 }
 
-class MovimientosDaninos inherits Movimiento {
-	var property danio
-	override method poder() = danio * 2
-	override method usar(r, o) {
-		super(r, o)
-		o.recibirDanio(danio)
+class Golpeador {
+	method habilidad(jugador) {
+		return jugador.velocidad() + jugador.skills() + jugador.punteria() + jugador.fuerza()
 	}
 }
 
-class MovimientosEspeciales inherits Movimiento {
-	var tipo
-	override method poder() = tipo.poder()
-	override method usar(r, o) {
-		super(r, o)
-		o.condicion(tipo)
-	}
-}
-// condiciones
-class Normal{
-	method permiteMoverse(pokemon) = true
-}
-
-class Suenio {
-	method poder() = 50
-	method permiteMoverse(pokemon) {
-		if(0.randomUpTo(2).roundUp().even()) {
-			pokemon.condicion(new Normal())
-			return true
-		}
-		return false
+class Buscador {
+	method habilidad(jugador) {
+		return jugador.velocidad() + jugador.skills() + jugador.reflejos() * jugador.vision()
 	}
 }
 
-class Paralisis {
-	method poder() = 30
-	method permiteMoverse(pokemon) {
-		return 0.randomUpTo(2).roundUp().even()
+class Jugador {
+	var property skills
+	var peso
+	var escoba
+	var property punteria
+	var property fuerza
+	var property reflejos
+	var property vision
+	var property posicion
+	var equipo
+	var valorMercadoEscoba
+
+	method manejoEscoba() {
+		return skills / peso
+	}
+	
+	method velocidad() {
+		return escoba.velocidad() * self.manejoEscoba()
+	}
+	
+	method habilidad() {
+		return posicion.habilidad()
+	}
+	
+	method lePasaElTrapoA(otroJugador) {
+		return self.habilidad() > 2 * otroJugador.habilidad()
+	}
+	
+	method esGroso() {
+		return self.habilidad() > equipo.promedioHabilidad() && self.velocidad() > valorMercadoEscoba
+	}
+	
+	method ganarPuntos(p) {
+		equipo.ganarPuntos(p)
+	}
+	
+	method mejorarSkills(mejora) {
+		skills += mejora
+	}
+	
+	method perderSkills(perdida) {
+		skills -= perdida
 	}
 }
 
-class Confusion {
-	var cantTurnos
-	method poder() = 40 * cantTurnos
-	method permiteMoverse(pokemon) {
-		if (cantTurnos > 0) {
-			pokemon.recibirDanio(20)
-			cantTurnos--
-			return false
-		}
-		return true
+class Equipo {
+	var property jugadores = []
+	var puntos
+	
+	method promedioHabilidad() {
+		return jugadores.sum({j => j.habilidad()}) / jugadores.size()
 	}
+	
+	method jugadorEstrellaContra(otroEquipo) {
+		return jugadores.any({jNuestro => otroEquipo.jugadores().all({jOtro => jNuestro.lePasaElTrapoA(jOtro)})})
+	}
+	
+	method ganarPuntos(cuantos) {
+		puntos += cuantos
+	}
+	
+	method cazadorMasRapido() {
+		
+	}
+	
+	method bloquearTiro() {
+		
+	}
+	
 }
 
-// errores
-class NoPuedeMoverseError inherits DomainException {}
-class MovimientoNoDisponibleError inherits DomainException {}
+
+
+
+
