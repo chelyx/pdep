@@ -1,5 +1,9 @@
 class PocionMagica {
 	var property ingredientes = []
+	
+	method ingerir(persona) {
+		ingredientes.forEach({i => i.efecto(persona, self)})
+	}
 }
 
 // Ingredientes
@@ -56,7 +60,7 @@ class Persona {
 	}
 	
 	method tomarPosion(posion) {
-		posion.ingredientes().forEach({i => i.efecto(self, posion)})
+		posion.ingerir(self)
 	}
 	
 	method fueraDeCombate() {
@@ -86,13 +90,7 @@ class Ejercito {
 		if(!self.fueraDeCombate()) {
 			const diferenciaPoder = self.poder() - enemigo.poder()
 			const menosPoderoso = [self, enemigo].sortedBy({p1, p2 => p1.poder() > p2.poder()})
-			menosPoderoso.last().recibirDanio(diferenciaPoder)
-//			if (diferenciaPoder > 0) {
-//				enemigo.recibirDanio(diferenciaPoder)
-//			} else {
-//				self.recibirDanio(diferenciaPoder)
-//			}
-		
+			menosPoderoso.last().recibirDanio(diferenciaPoder)		
 		}
 	}
 }
