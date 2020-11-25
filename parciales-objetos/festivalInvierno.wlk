@@ -5,12 +5,11 @@ class Vikingo {
 	var property velocidad
 	var property barbarosidad
 	var item
-	var danio
 	
 	method danioItem() = item.danio()
 	
 	method danio() {
-		return self.danioItem() + danio
+		return self.danioItem() + barbarosidad
 	}
 	
 	method aumentarHambre(incremento) {
@@ -21,6 +20,10 @@ class Vikingo {
 	method esMejorPara(posta, otroVikingo){
 		const ganador = posta.conocerGanador([self, otroVikingo])
 		return ganador == self
+	}
+	
+	method maximoKgPescado() {
+		return self.peso() * 0.5 + self.barbarosidad() * 2
 	}
 }
 
@@ -108,16 +111,13 @@ class Competencia {
 
 
 class Pesca inherits Competencia{
-	method maximoKgPescado(vikingo) {
-		return vikingo.peso() * 0.5 + vikingo.barbarosidad() * 2
-	}
 	
 	method terminarComp() {
 		self.aumentarHambre(5)
 	}
 	
 	method deMejorAPeor() {
-		return participantes.sortedBy({v1, v2 => self.maximoKgPescado(v1) > self.maximoKgPescado(v2)})
+		return participantes.sortedBy({v1, v2 => v1.maximoKgPescado() > v2.maximoKgPescado()})
 	}
 	
 	method conocerGanador() {
@@ -137,16 +137,13 @@ class Pesca inherits Competencia{
 }
 
 class Combate inherits Competencia{
-	method cuantoDanioCausa(vikingo) {
-		return vikingo.barbarosidad() + vikingo.danioItem()
-	}
 	
 	method terminarComp(){
 		self.aumentarHambre(10)
 	}
 
 	method deMejorAPeor() {
-		return participantes.sortedBy({v1, v2 =>  self.cuantoDanioCausa(v1) > self.cuantoDanioCausa(v2)})
+		return participantes.sortedBy({v1, v2 =>  v1.danio() > v2.danio()})
 	}
 	
 	method conocerGanador() {
